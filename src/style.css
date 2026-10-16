@@ -1,0 +1,214 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: #87ceeb;
+  font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+  color: #fff;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+canvas { display: block; }
+
+/* ---------- Score (top left) ---------- */
+#hud {
+  position: fixed;
+  top: 18px;
+  left: 20px;
+  pointer-events: none;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
+}
+
+.score small {
+  display: block;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.score span {
+  font-size: clamp(40px, 7vw, 64px);
+  font-weight: 800;
+  font-style: italic;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+  font-size: 15px;
+}
+
+.stats b { font-variant-numeric: tabular-nums; }
+
+.coin-dot {
+  width: 16px;
+  height: 16px;
+  margin-right: -10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff0a8, #ffc933 55%, #c58a00);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+#help {
+  margin-top: 14px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  opacity: 0.8;
+}
+
+/* ---------- Speedometer + nitro (top right) ---------- */
+#dash {
+  position: fixed;
+  top: 14px;
+  right: 16px;
+  width: clamp(130px, 20vw, 190px);
+  pointer-events: none;
+}
+
+#gauge svg {
+  width: 100%;
+  display: block;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45));
+}
+
+.g-face { fill: rgba(12, 16, 24, 0.78); stroke: rgba(255, 255, 255, 0.35); stroke-width: 2; }
+.g-boost { fill: none; stroke: #3cc8ff; stroke-width: 5; stroke-linecap: round; }
+.t-major { stroke: #fff; stroke-width: 2.4; }
+.t-minor { stroke: rgba(255, 255, 255, 0.55); stroke-width: 1.4; }
+.t-lbl {
+  fill: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+.g-needle { stroke: #ff3b30; stroke-width: 3; stroke-linecap: round; }
+.g-hub { fill: #20242c; stroke: #ff3b30; stroke-width: 3; }
+.g-num {
+  fill: #fff;
+  font-size: 26px;
+  font-weight: 800;
+  font-style: italic;
+  text-anchor: middle;
+  font-variant-numeric: tabular-nums;
+}
+.g-unit { fill: rgba(255, 255, 255, 0.7); font-size: 10px; text-anchor: middle; }
+
+#nitro {
+  position: relative;
+  height: 16px;
+  margin-top: 8px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(12, 16, 24, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+#nitroFill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #1b8cff, #3cf0ff);
+  transition: filter 0.15s;
+}
+
+#nitro span {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+#nitro.active { box-shadow: 0 0 14px 2px rgba(60, 200, 255, 0.85); }
+#nitro.active #nitroFill { filter: brightness(1.4); }
+
+/* ---------- Start / pause / game over ---------- */
+#message {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 14px;
+  text-align: center;
+  background: rgba(10, 16, 24, 0.55);
+  backdrop-filter: blur(3px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s;
+}
+
+#message.show { opacity: 1; visibility: visible; }
+
+#message h1 {
+  font-size: clamp(40px, 10vw, 96px);
+  font-style: italic;
+  font-weight: 800;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+}
+
+#message p {
+  font-size: clamp(15px, 2.4vw, 20px);
+  line-height: 1.7;
+}
+
+#message b { color: #ffd23f; }
+
+#msgBtn {
+  margin-top: 6px;
+  padding: 14px 44px;
+  border: 0;
+  border-radius: 999px;
+  background: #e32135;
+  color: #fff;
+  font: inherit;
+  font-size: 20px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(227, 33, 53, 0.5);
+  transition: transform 0.12s, background 0.12s;
+}
+
+#msgBtn:hover { background: #ff2f45; transform: scale(1.05); }
+#msgBtn:active { transform: scale(0.97); }
+#msgBtn:focus-visible { outline: 3px solid #ffd23f; outline-offset: 3px; }
+
+/* ---------- Touch controls (phones and tablets) ---------- */
+#touch { display: none; }
+
+@media (pointer: coarse) {
+  #help { display: none; }
+  #touch {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 18px;
+  }
+  #touch .pad { display: flex; gap: 10px; }
+  #touch button {
+    min-width: 70px;
+    height: 70px;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.35);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    touch-action: none;
+  }
+  #touch .nitro-btn { border-color: #3cc8ff; color: #3cc8ff; }
+  #touch button:active { background: rgba(227, 33, 53, 0.7); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #message, #msgBtn { transition: none; }
+}
